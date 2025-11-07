@@ -2,4 +2,8 @@ flask==3.0.0
 pytest==7.4.3
 pytest-cov==4.1.0
 pytest-html==4.1.1
+<<<<<<< HEAD
 Werkzeug==3.0.1
+=======
+Werkzeug==3.0.1
+>>>>>>> 1cb59ecf9265dff8bfe1c61236c0b2cb86a9ce2d
