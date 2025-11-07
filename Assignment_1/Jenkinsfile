@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Sukanthi2000/Assignment_Sukanthi.git'
+               git branch: 'main', url: 'https://github.com/Sukanthi2000/Assignment_Sukanthi.git'
             }
         }
 
