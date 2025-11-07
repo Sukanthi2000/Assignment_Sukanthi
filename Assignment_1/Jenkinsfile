@@ -15,7 +15,8 @@ pipeline {
 
         stage('Build Python App') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'python3 -m pip install -r Assignment_1/requirements.txt'
+
             }
         }
 
