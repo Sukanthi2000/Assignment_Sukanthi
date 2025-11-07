@@ -20,11 +20,16 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                sh 'python3 -m pytest Assignment_1/ -v'
-            }
-        }
+       stage('Test') {
+           steps {
+             sh '''
+            echo "Running tests and generating report..."
+            pytest Assignment_1/ -v --junitxml=pytest-report.xml
+          '''
+        junit 'pytest-report.xml'
+      }
+   }
+
 
         stage('Build Docker Image') {
             steps {
