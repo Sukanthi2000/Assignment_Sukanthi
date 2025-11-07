@@ -9,13 +9,14 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Sukanthi2000/Assignment_Sukanthi.git'
+               git branch: 'main', url: 'https://github.com/Sukanthi2000/Assignment_Sukanthi.git'
             }
         }
 
         stage('Build Python App') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'python3 -m pip install -r Assignment_1/requirements.txt'
+
             }
         }
 
@@ -27,7 +28,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE_NAME ."
+                sh 'docker build -t jenkins-python-demo ./Assignment_1'
             }
         }
 
