@@ -24,7 +24,7 @@ pipeline {
            steps {
              sh '''
             echo "Running tests and generating report..."
-            pytest Assignment_1/ -v --junitxml=pytest-report.xml
+             sh'python3 -m pytest Assignment_1/ -v --junitxml=pytest-report.xml
           '''
         junit 'pytest-report.xml'
       }
