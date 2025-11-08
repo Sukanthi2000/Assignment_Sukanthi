@@ -52,10 +52,10 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-k8s-demo:latest
 
       # 7. Deploy to Kubernetes
-      - name: Set up kubeconfig
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
-          export KUBECONFIG=$PWD/kubeconfig
+      - name: Use Kind's kubeconfig
+          run:|
+             export KUBECONFIG="$(kind get kubeconfig-path --name="flask-cluster")"
+
 
       - name: Deploy to Kind
         run: |
