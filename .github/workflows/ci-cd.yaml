@@ -95,3 +95,10 @@ jobs:
           kubectl get deployments
           kubectl get pods
           kubectl get svc
+
+      - name: Port-forward and test Flask app
+        run: |
+         kubectl port-forward service/flask-service 8080:80 &
+         sleep 10  # Give it time to start
+         curl --fail http://localhost:8080 || (echo "App not responding" && exit 1)
+
