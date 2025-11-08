@@ -53,7 +53,7 @@ jobs:
 
       # 7. Deploy to Kubernetes
       - name: Use Kind's kubeconfig
-          run:|
+        run: |
              export KUBECONFIG="$(kind get kubeconfig-path --name="flask-cluster")"
 
 
