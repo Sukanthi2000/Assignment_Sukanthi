@@ -59,8 +59,8 @@ jobs:
 
       - name: Deploy to Minikube
         run: |
-          kubectl apply -f Assignments_3/deployment.yaml
-          kubectl apply -f Assignments_3/service.yaml
+          kubectl apply -f Assignment_3/deployment.yaml
+          kubectl apply -f Assignment_3/service.yaml
 
       # 8. Wait for pods to be running and show deployments, pods, and services
       - name: Wait for pods and show resources
