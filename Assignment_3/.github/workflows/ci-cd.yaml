@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r Assignments_3/requirements.txt
 
       # 4. Run tests (if any)
       - name: Run tests
@@ -30,7 +30,7 @@ jobs:
 
       # 5. Build Docker image
       - name: Build Docker image
-        run: docker build -t flask-k8s-demo:latest .
+        run: docker build -t flask-k8s-demo:latest ./Assignments_3
 
       # 6. (Optional) Push Docker image to Docker Hub
       - name: Docker Login
@@ -50,3 +50,11 @@ jobs:
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
+
+       # Wait until all pods are in Running state (max 120s)
+        kubectl wait --for=condition=Ready pod -l app=flask-app --timeout=120s
+  
+       #  Show deployments, pods, and services
+         kubectl get deployments
+         kubectl get pods
+         kubectl get svc
