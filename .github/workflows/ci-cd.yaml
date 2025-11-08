@@ -23,7 +23,7 @@ jobs:
       # 3. Install dependencies
       - name: Install dependencies
         run: |
-          cd Assignments_3
+          cd Assignment_3
           ls -R
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -35,7 +35,7 @@ jobs:
 
       # 5. Build Docker image
       - name: Build Docker image
-        run: docker build -t flask-k8s-demo:latest ./Assignments_3
+        run: docker build -t flask-k8s-demo:latest ./Assignment_3
 
       # 6. (Optional) Push Docker image to Docker Hub
       - name: Docker Login
