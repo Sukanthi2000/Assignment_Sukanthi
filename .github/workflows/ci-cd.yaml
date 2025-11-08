@@ -51,10 +51,18 @@ jobs:
           docker tag flask-k8s-demo:latest ${{ secrets.DOCKER_USERNAME }}/flask-k8s-demo:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-k8s-demo:latest
 
-      # 7. Deploy to Kubernetes
-      - name: Use Kind's kubeconfig
+      # 7. Deploy to Kind
+      - name: Install Kind
         run: |
-             export KUBECONFIG="$(kind get kubeconfig --name my-cluster)"
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      - name: Create Kind cluster
+        run: kind create cluster --name my-cluster
+
+      - name: Set kubeconfig
+        run: kind get kubeconfig --name my-cluster > ~/.kube/config
 
       - name: Deploy to Kind
         run: |
