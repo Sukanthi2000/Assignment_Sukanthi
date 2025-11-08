@@ -57,7 +57,7 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig
           export KUBECONFIG=$PWD/kubeconfig
 
-      - name: Deploy to Minikube
+      - name: Deploy to Kind
         run: |
           kubectl apply -f Assignment_3/deployment.yaml
           kubectl apply -f Assignment_3/service.yaml
