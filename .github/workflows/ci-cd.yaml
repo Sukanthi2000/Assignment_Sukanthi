@@ -69,6 +69,13 @@ jobs:
           kubectl apply -f Assignment_3/deployment.yaml
           kubectl apply -f Assignment_3/Service.yaml
 
+      - name: Debug pod status
+        run: |
+          kubectl get pods -l app=flask-app
+          kubectl describe pods -l app=flask-app || true
+          kubectl logs -l app=flask-app || true
+  
+
       # 8. Wait for pods to be running and show deployments, pods, and services
       - name: Wait for pods and show resources
         run: |
