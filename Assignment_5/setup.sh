@@ -18,7 +18,8 @@ echo "✅ Docker and Docker Compose are installed."
 
 # Build and start services
 echo "🚀 Starting services with Docker Compose..."
-docker-compose up -d --build
+docker compose up -d --build
+
 
 echo "📋 Checking container health..."
 docker ps --format "table {{.Names}}\t{{.Status}}"
