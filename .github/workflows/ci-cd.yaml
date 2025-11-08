@@ -59,7 +59,9 @@ jobs:
           sudo mv ./kind /usr/local/bin/kind
 
       - name: Create Kind cluster
-        run: kind create cluster --name my-cluster
+        run: |
+           kind create cluster --name my-cluster
+           kind get clusters
 
       - name: Set kubeconfig
         run: kind get kubeconfig --name my-cluster > ~/.kube/config
@@ -75,7 +77,8 @@ jobs:
 
       - name: Debug pod status
         run: |
-          kubectl get pods -l app=flask-app
+          kubectl get nodes
+          kubectl get pods  
           kubectl describe pods -l app=flask-app || true
           kubectl logs -l app=flask-app || true
   
