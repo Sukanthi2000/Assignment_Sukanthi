@@ -64,6 +64,10 @@ jobs:
       - name: Set kubeconfig
         run: kind get kubeconfig --name my-cluster > ~/.kube/config
 
+      - name: Load Docker image into Kind
+        run: kind load docker-image flask-k8s-demo:latest --name my-cluster
+
+
       - name: Deploy to Kind
         run: |
           kubectl apply -f Assignment_3/deployment.yaml
