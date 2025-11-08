@@ -29,7 +29,7 @@ echo -e "${YELLOW}**************************************************************
 
 # Build and start services
 echo -e "${BLUE}🚀 Starting services with Docker Compose...${NC}"
-docker compose up -d --build
+docker compose up 
 
 echo -e "${YELLOW}**************************************************************************************************************************${NC}"
 
