@@ -25,4 +25,4 @@ echo "📋 Checking container health..."
 docker ps --format "table {{.Names}}\t{{.Status}}"
 
 echo "📂 Logs:"
-docker-compose logs --tail=20
+docker compose logs --tail=20
