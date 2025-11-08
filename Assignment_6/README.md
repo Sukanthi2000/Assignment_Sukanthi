@@ -1,124 +1,108 @@
-Here's a complete guide to help you deploy a local monitoring stack using Prometheus and Grafana for a containerized app:
+
+# 📦 Monitoring Stack with Prometheus + Grafana
+
+This project sets up a containerized Python Flask application with a `/metrics` endpoint, monitored using Prometheus and visualized through Grafana.
 
 ---
 
-## 🚀 Step-by-Step Guide: Monitoring Stack with Prometheus + Grafana
-
-### 🧩 1. Set Up a Sample App with `/metrics` Endpoint
-
-You can use a simple Python Flask app with `prometheus_client`:
-
-```python
-# app.py
-from flask import Flask
-from prometheus_client import Counter, generate_latest
-
-app = Flask(__name__)
-REQUEST_COUNT = Counter('app_requests_total', 'Total number of requests')
-
-@app.route('/')
-def home():
-    REQUEST_COUNT.inc()
-    return "Hello, World!"
-
-@app.route('/metrics')
-def metrics():
-    return generate_latest()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-```
-
-**Dockerfile:**
-
-```Dockerfile
-FROM python:3.9
-WORKDIR /app
-COPY app.py .
-RUN pip install flask prometheus_client
-EXPOSE 5000
-CMD ["python", "app.py"]
-```
-
----
-
-### 🐳 2. Deploy Prometheus + Grafana Using Docker Compose
-
-**Directory Structure:**
+## 📁 Folder Structure
 
 ```
-monitoring/
-├── docker-compose.yml
+Assignment_6/
+├── app.py                  # Flask app exposing Prometheus metrics
+├── Dockerfile              # Container setup for the Flask app
+├── docker-compose.yaml     # Orchestration of all services
 ├── prometheus/
-│   └── prometheus.yml
+│   └── prometheus.yml      # Prometheus configuration
+└── README.md               # Project documentation
 ```
 
-**`prometheus/prometheus.yml`:**
+---
+
+## 🚀 Setup Instructions
+
+### 1. Build and Launch the Stack
+
+From the `Assignment_6/` directory, run:
+
+```bash
+docker-compose up --build
+```
+
+This will start the following services:
+- **sample-app**: Flask app exposing metrics at `/metrics`
+- **prometheus**: Scrapes metrics from the app
+- **grafana**: Visualizes metrics from Prometheus
+
+---
+
+## 🔗 Prometheus Configuration
+
+Prometheus is configured via `prometheus/prometheus.yml` to scrape metrics from the Flask app:
 
 ```yaml
-global:
-  scrape_interval: 5s
-
 scrape_configs:
   - job_name: 'sample-app'
     static_configs:
       - targets: ['sample-app:5000']
 ```
 
-**`docker-compose.yml`:**
-
-```yaml
-version: '3.8'
-services:
-  sample-app:
-    build: .
-    ports:
-      - "5000:5000"
-
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-
-volumes:
-  grafana-storage:
-```
-
-Run with:
-
-```bash
-docker-compose up --build
-```
+- Prometheus scrapes the `/metrics` endpoint every 5 seconds.
+- Access Prometheus UI at: [http://localhost:9090](http://localhost:9090)
 
 ---
 
-### 📊 3. Visualize Custom Metrics in Grafana
+## 📊 Grafana Setup & Prometheus Connection
 
-1. Access Grafana at `http://localhost:3000`
-2. Login (default: `admin` / `admin`)
-3. Add Prometheus as a data source:
-   - URL: `http://prometheus:9090`
-4. Create a new dashboard:
-   - Add a panel with query: `app_requests_total`
+1. **Access Grafana**  
+   Open [http://localhost:3000](http://localhost:3000)  
+   Default login:  
+   - **Username**: `admin`  
+   - **Password**: `admin`
+
+2. **Add Prometheus as a Data Source**  
+   - Go to **Settings → Data Sources → Add data source**
+   - Choose **Prometheus**
+   - Set the URL to: `http://prometheus:9090`
+   - Click **Save & Test**
+
+3. **Create a Dashboard**  
+   - Click **+ → Dashboard → Add new panel**
+   - In the query field, enter: `app_requests_total`
+   - Choose visualization type (e.g., Graph, Gauge)
+   - Click **Apply** to save the panel
 
 ---
 
-### 📤 4. Create and Export a Dashboard
+## 📤 Exporting Dashboards
 
-1. After creating your dashboard:
-   - Click the **gear icon** → **JSON Model**
-   - Click **Export** to download the dashboard JSON
-2. You can reuse this JSON to import the dashboard later or share it with others.
+To export your dashboard:
+- Open the dashboard
+- Click the **gear icon (⚙️)** → **JSON Model**
+- Click **Export** to download the dashboard JSON
+- You can import this JSON later to reuse or share the dashboard
 
 ---
 
-Would you like me to generate a sample dashboard JSON or help you customize the metrics further?
+## 🛠️ Troubleshooting
+
+- **Prometheus target not showing as "UP"**:
+  - Visit [http://localhost:9090/targets](http://localhost:9090/targets)
+  - Ensure the `sample-app` target is listed and its status is **UP**
+  - If it's **DOWN**, check:
+    - The Flask app is running and accessible at `sample-app:5000`
+    - The `prometheus.yml` target matches the service name and port
+    - No port conflicts or container startup errors
+
+- **Grafana can't connect to Prometheus**:
+  - Verify Prometheus is running at `http://prometheus:9090`
+  - Ensure the Docker network allows inter-service communication
+  - Restart Grafana and reconfigure the data source if needed
+
+- **No data in Grafana panel**:
+  - Confirm Prometheus is scraping metrics (`/metrics` endpoint returns data)
+  - Check the query in the panel (e.g., `app_requests_total`)
+  - Adjust the time range in the dashboard to include recent data
+
+---
+
