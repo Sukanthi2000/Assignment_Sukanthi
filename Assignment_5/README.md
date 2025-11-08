@@ -1,3 +1,4 @@
+
 # 🚀 Infrastructure Automation with Shell + Docker Compose
 
 This project simulates a DevOps automation pipeline locally—without relying on any cloud services. It uses Docker Compose to orchestrate multiple services and a shell script to automate environment setup.
@@ -6,12 +7,12 @@ This project simulates a DevOps automation pipeline locally—without relying on
 
 ## 📦 Services Included
 
-| Service     | Purpose                        | Port |
-|-------------|--------------------------------|------|
-| Jenkins     | CI/CD automation server        | 8080 |
-| Redis       | In-memory data store           | 6379 |
-| Nginx       | Reverse proxy for sample app   | 80   |
-| Sample App  | Simple Flask web application   | 5000 |
+| Service      | Purpose                        | Port |
+|--------------|--------------------------------|------|
+| Jenkins      | CI/CD automation server        | 8080 |
+| Redis        | In-memory data store           | 6379 |
+| Nginx        | Reverse proxy for sample app   | 80   |
+| Sample App   | Simple Flask web application   | 5000 |
 
 ---
 
@@ -23,23 +24,64 @@ This project simulates a DevOps automation pipeline locally—without relying on
 
 ---
 
-### 🛠️ Setup Instructions
+## 🛠️ Setup Instructions
 
-#### 1. Clone the repository
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/infra-automation.git
+   cd infra-automation
+   ```
+
+2. **Run the setup script**
+   ```bash
+   ./setup.sh
+   ```
+
+   This script will:
+   - Check for Docker and Docker Compose
+   - Build and start all services
+   - Display container health status
+   - Show recent logs for debugging
+
+---
+
+## 🧪 Health Checks
+
+Each service includes a Docker health check to monitor availability:
+
+- Jenkins: `curl -f http://localhost:8080`
+- Redis: `redis-cli ping`
+- Nginx: `curl -f http://localhost`
+- Sample App: `curl -f http://localhost:5000`
+
+You can inspect health status using:
 
 ```bash
-git clone https://github.com/your-username/infra-automation.git
-cd infra-automation
-2. Run the setup script
-bash
-Copy code
-./setup.sh
-This script will:
+docker ps
+docker inspect <container_name>
+```
 
-✅ Check for Docker and Docker Compose
+---
 
-🔨 Build and start all services
+## 📂 File Structure
 
-📋 Display container health status
+```
+infra-automation/
+├── docker-compose.yml         # Service definitions and health checks
+├── setup.sh                   # Shell script to automate setup
+├── nginx/
+│   └── default.conf           # Nginx reverse proxy config
+├── app.py                 # Simple Flask app
+│__ Dockerfile             # Dockerfile for sample app
+```
 
-📂 Show recent logs for debugging
+---
+
+## 🎯 Bonus Features
+
+- Health checks for all services
+- Logs displayed after startup
+- Modular and extensible architecture
+
+---
+
