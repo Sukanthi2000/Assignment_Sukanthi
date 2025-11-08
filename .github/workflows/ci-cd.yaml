@@ -37,6 +37,11 @@ jobs:
       - name: Build Docker image
         run: docker build -t flask-k8s-demo:latest ./Assignment_3
 
+      - name: Docker existing images
+        run: |
+          docker version
+          docker images
+
       # 6. (Optional) Push Docker image to Docker Hub
       - name: Docker Login
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
