@@ -1,12 +1,14 @@
-
 name: Flask CI/CD
+
 on:
   push:
     branches:
-      - main    # Runs workflow when code is pushed to main
+      - main  # Runs workflow when code is pushed to main
+
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest  # Workflow runs on a Linux VM
+
     steps:
       # 1. Checkout your code
       - name: Checkout repo
@@ -19,12 +21,13 @@ jobs:
           python-version: '3.11'
 
       # 3. Install dependencies
+      - name: Install dependencies
         run: |
-            cd Assignments_3
-            ls -R
-            python -m pip install --upgrade pip
-            pip install -r Assignments_3/requirements.txt
-            
+          cd Assignments_3
+          ls -R
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       # 4. Run tests (if any)
       - name: Run tests
         run: |
@@ -37,6 +40,7 @@ jobs:
       # 6. (Optional) Push Docker image to Docker Hub
       - name: Docker Login
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
       - name: Push image
         run: |
           docker tag flask-k8s-demo:latest ${{ secrets.DOCKER_USERNAME }}/flask-k8s-demo:latest
@@ -50,13 +54,13 @@ jobs:
 
       - name: Deploy to Minikube
         run: |
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
+          kubectl apply -f Assignments_3/deployment.yaml
+          kubectl apply -f Assignments_3/service.yaml
 
-       # Wait until all pods are in Running state (max 120s)
-        kubectl wait --for=condition=Ready pod -l app=flask-app --timeout=120s
-  
-       #  Show deployments, pods, and services
-         kubectl get deployments
-         kubectl get pods
-         kubectl get svc
+      # 8. Wait for pods to be running and show deployments, pods, and services
+      - name: Wait for pods and show resources
+        run: |
+          kubectl wait --for=condition=Ready pod -l app=flask-app --timeout=120s
+          kubectl get deployments
+          kubectl get pods
+          kubectl get svc
