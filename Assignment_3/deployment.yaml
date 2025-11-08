@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: python-image:latest
+        image: flask-k8s-demo:latest
         imagePullPolicy: IfNotPresent  # Added imagePullPolicy for local images
         ports:
         - containerPort: 5000
