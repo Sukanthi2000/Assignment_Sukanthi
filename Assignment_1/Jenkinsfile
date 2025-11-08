@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "jenkins-python-demo"
+        IMAGE_NAME = "python-image"
         CONTAINER_NAME = "python-container"
     }
 
