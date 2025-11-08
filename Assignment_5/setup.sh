@@ -8,11 +8,11 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Check Docker Compose
-if ! command -v docker-compose &> /dev/null; then
+if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
     echo "❌ Docker Compose not found. Please install Docker Compose."
     exit 1
 fi
+
 
 echo "✅ Docker and Docker Compose are installed."
 
