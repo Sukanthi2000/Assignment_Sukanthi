@@ -8,7 +8,7 @@ services:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - jenkins_home:/var/jenkins_home
+      - ./jenkins_home:/var/jenkins_home 
     healthcheck:
       test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:8080/ || exit 1"]
       interval: 20s
