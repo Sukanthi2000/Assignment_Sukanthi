@@ -1,7 +1,3 @@
-Perfect 👏 You’re ready for the **GitOps Simulation Report** part!
-Since you only want a **README-style writeup (no code)** — here’s a clean, professional version you can copy directly into your `README.md` or assignment report:
-
----
 
 # 🚀 GitOps with Argo CD — Deployment Simulation (Using kind / EC2)
 
