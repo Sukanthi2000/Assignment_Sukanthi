@@ -1,46 +1,108 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Define color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# Basic helper script to prepare local host and start docker-compose stack.
+# Usage: sudo ./setup.sh   (some installs require sudo)
+# Note: script prints instructions rather than forcibly installing in some systems.
 
-echo -e "${CYAN}🔧 Setting up environment...${NC}"
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
+WORKDIR="$(cd "$(dirname "$0")" && pwd)"
+COMPOSE_FILE="$WORKDIR/docker-compose.yml"
 
-# Check Docker
-if ! command -v docker &> /dev/null; then
-    echo -e "${RED}❌ Docker not found. Please install Docker.${NC}"
-    exit 1
+echo "== Infra setup script =="
+echo "Working directory: $WORKDIR"
+
+# --- Check docker ---
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Docker not found. Please install Docker first."
+  echo "Ubuntu: sudo apt update && sudo apt install -y docker.io"
+  echo "Amazon Linux 2: sudo yum install -y docker"
+  echo "Then: sudo systemctl start docker && sudo usermod -aG docker \$USER"
+  exit 1
 fi
 
-# Check Docker Compose
-if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
-    echo -e "${RED}❌ Docker Compose not found. Please install Docker Compose.${NC}"
+# --- Check docker-compose ---
+if ! command -v docker-compose >/dev/null 2>&1; then
+  if docker compose version >/dev/null 2>&1; then
+    echo "Using docker CLI 'docker compose'"
+    DOCKER_COMPOSE_CMD="docker compose"
+  else
+    echo "docker-compose not found. Install docker-compose or use Docker CLI v2 (docker compose)."
+    echo "Ubuntu example: sudo apt install -y docker-compose-plugin"
     exit 1
+  fi
+else
+  DOCKER_COMPOSE_CMD="docker-compose"
 fi
 
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
-echo -e "${GREEN}✅ Docker and Docker Compose are installed.${NC}"
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
+echo "Using compose command: $DOCKER_COMPOSE_CMD"
 
-# Build and start services
-echo -e "${BLUE}🚀 Starting services with Docker Compose...${NC}"
-docker compose up 
+# Build local sample app image
+echo "Building sample-app..."
+$DOCKER_COMPOSE_CMD build --pull --no-cache sample-app
 
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
+# Start stack
+echo "Starting stack..."
+$DOCKER_COMPOSE_CMD up -d
 
-# Check container health
-echo -e "${CYAN}📋 Checking container health...${NC}"
-docker ps --format "table {{.Names}}\t{{.Status}}"
+# Wait for health checks to turn healthy (max 120s)
+echo "Waiting for services to report healthy status..."
+MAX_RETRIES=24
+SLEEP=5
+count=0
 
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
+check_health() {
+  # returns 0 if all healthy or no healthcheck defined
+  local all_ok=0
+  for svc in infra_jenkins infra_redis infra_sample_app infra_nginx; do
+    if docker inspect --format='{{json .State.Health}}' "$svc" >/dev/null 2>&1; then
+      state=$(docker inspect --format='{{.State.Health.Status}}' "$svc")
+      if [ "$state" != "healthy" ]; then
+        echo "Service $svc health: $state"
+        all_ok=1
+      fi
+    else
+      # no health info: check running state
+      running=$(docker inspect --format='{{.State.Running}}' "$svc" 2>/dev/null || echo "false")
+      if [ "$running" != "true" ]; then
+        echo "Service $svc not running"
+        all_ok=1
+      fi
+    fi
+  done
+  return $all_ok
+}
 
-# Show logs
-echo -e "${CYAN}📂 Logs:${NC}"
-docker compose logs --tail=20
+while (( count < MAX_RETRIES )); do
+  if check_health; then
+    echo "Waiting ${SLEEP}s..."
+    sleep $SLEEP
+    count=$((count+1))
+  else
+    echo "All services are healthy (or running)."
+    break
+  fi
+done
 
-echo -e "${YELLOW}**************************************************************************************************************************${NC}"
+echo "Services status:"
+$DOCKER_COMPOSE_CMD ps
+
+# Print endpoints
+echo
+echo "Access endpoints (host:port):"
+echo " - Jenkins: http://localhost:8080 (initial admin password: see container logs)"
+echo " - Redis: localhost:6379"
+echo " - Sample App: http://localhost:5000"
+echo " - Nginx (reverse proxy): http://localhost:80"
+
+echo
+echo "To tail logs:"
+echo " $ $DOCKER_COMPOSE_CMD logs -f --tail=200"
+echo
+echo "To view Jenkins initial admin password:"
+echo " $ docker logs infra_jenkins 2>/dev/null | sed -n '1,200p' | grep -i '********' -n || docker logs infra_jenkins | sed -n '1,200p'"
+
+echo
+echo "If any service fails health, check logs with:"
+echo " $ $DOCKER_COMPOSE_CMD logs <service>"
+echo
+echo "Done."
